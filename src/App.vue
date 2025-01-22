@@ -14,7 +14,7 @@
                v-model="uab" type="number" required>
       </div>
       <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2" for="bandera">BANDERA</label>
+        <label class="block text-gray-800 text-sm font-bold mb-2" for="bandera">Bandera</label>
         <select v-model="bandera" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300" required>
           <option value="">Seleccione bandera</option>
           <option value="venezolana">Venezolana</option>
@@ -22,7 +22,7 @@
         </select>
       </div>
       <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2" for="puerto">CAPITANÍA</label>
+        <label class="block text-gray-800 text-sm font-bold mb-2" for="puerto">Capitanía</label>
         <select v-model="puerto" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300" id="puerto" name="puerto" required>
           <option value="">Seleccione puerto</option>
           <option value="apure">Apure</option>
@@ -51,7 +51,7 @@
     </form>
 
     <div v-if="resultado" class="mt-6 bg-white p-4 rounded-lg shadow-md">
-      <h2 class="text-lg font-bold mb-4 text-gray-800">Resultado</h2>
+      <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Alícuota</h2>
       <div v-if="uab <= 500">
         <p class="text-gray-700">Total (VES): {{ resultado.bs }}</p>
         <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
