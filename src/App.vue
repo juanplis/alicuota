@@ -64,16 +64,20 @@
         <p class="text-gray-700">Total (Bolivares): {{ resultado.bs }}</p>
         <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Pilotaje</h2>
         <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
+        <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
         <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
         <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
+        <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
       </div>
       <div v-else>
         <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
         <p class="text-gray-700">Total (Bolivares): {{ resultado.totalFinal }}</p>
         <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Pilotaje</h2>
         <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
+        <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
         <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
         <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
+        <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
       </div>
     </div>
   </div>
@@ -190,6 +194,10 @@ export default {
     }
   },
 
+
+  /* ********** Mostrar resultados  ***********  */
+
+
   calcularYMostrarResultado() {
   // Calcula los resultados básicos
   if (this.uab <= 500) {
@@ -201,8 +209,16 @@ export default {
   // Llama a CalculaPilotaje y añade el resultado
   const pilotajeResult = this.CalculaPilotaje();
   this.resultado.totalppilotaje = pilotajeResult.totalppilotaje; // Agregar el total de pilotaje
-  const lancajeResult =this.CalculaLanchaje();
-  this.resultado.totallanchaje = lancajeResult.totallanchaje;
+  //this.totalppilotajeVES = pilotajeResult.totalppilotajeVES;
+  this.resultado.totalppilotajeVES = pilotajeResult.totalppilotajeVES; // Asegúrate de que estás asignando correctamente
+
+  
+    const lanchajeResult = this.CalculaLanchaje();
+    this.resultado.totallanchaje = lanchajeResult.totallanchaje;
+    this.resultado.totallanchajeVES = lanchajeResult.totallanchajeVES;
+
+
+
 },
 
 
@@ -246,19 +262,26 @@ export default {
     };
   },
 
-  CalculaPilotaje() {
-    let costoPilotaje = 0;
 
-    if (this.bandera === "extranjera") {
-      costoPilotaje = this.CalculaPilotajeE(this.uab , this.bandera , this.maniobras);
-    } else if(this.bandera === "venezolana"){
-      costoPilotaje = this.CalculaPilotajeV(this.uab, this.bandera), this.maniobras;
-    }
+      /* ********************* Calculador de Pilotaje ********************* */
+
+  CalculaPilotaje() {
+  let costoPilotaje = 0;
+
+  if (this.bandera === "extranjera") {
+    costoPilotaje = this.CalculaPilotajeE(this.uab);
+  } else if (this.bandera === "venezolana") {
+    costoPilotaje = this.CalculaPilotajeV(this.uab);
+  }
+
+    const totalppilotaje = this.maniobras * costoPilotaje.totalppilotaje;
+    const totalppilotajeVES = this.BCV * totalppilotaje;
 
     return {
-      totalppilotaje: costoPilotaje.totalppilotaje // Asegúrate de devolver el total
-    };
-  },
+      totalppilotaje: totalppilotaje.toFixed(2),
+      totalppilotajeVES: totalppilotajeVES.toFixed(2),
+  };
+},
 
   CalculaPilotajeE(uab) {
     let costoPilotaje = 0;
@@ -298,9 +321,10 @@ export default {
         costoPilotaje = this.pilotajeE.p;
     }
       const totalppilotaje = this.maniobras * costoPilotaje ; 
-      
+     
       return {
           totalppilotaje: totalppilotaje.toFixed(2),
+         
       };
 
   },
@@ -346,23 +370,38 @@ export default {
       
       return {
           totalppilotaje: totalppilotaje.toFixed(2),
+          
       };
 
   },
+
+
+
+    /*aquí se encuentra el calculador de Lanchaje*/ 
+    /* ******************************************* */
+
+
+
+
+
   
-  CalculaLanchaje() {
+    CalculaLanchaje() {
     let costolanchaje = 0;
 
     if (this.bandera === "extranjera") {
-      costolanchaje = this.CalculaLanchajeE(this.uab , this.bandera , this.maniobras);
-    } else if(this.bandera === "venezolana"){
-      costolanchaje = this.CalculaLanchajeV(this.uab, this.bandera), this.maniobras;
+        costolanchaje = this.CalculaLanchajeE(this.uab);
+    } else if (this.bandera === "venezolana") {
+        costolanchaje = this.CalculaLanchajeV(this.uab);
     }
 
+    const totallanchaje = this.maniobras * costolanchaje.totallanchaje;
+    const totallanchajeVES = this.BCV * totallanchaje; // Si esta línea no se usa, considera eliminarla
+
     return {
-      totallanchaje: costolanchaje.totallanchaje // Asegúrate de devolver el total
+        totallanchaje: totallanchaje.toFixed(2),
+        totallanchajeVES: totallanchajeVES.toFixed(2), // Descomentar si es necesario
     };
-  },
+},
   CalculaLanchajeE(uab){
     let costolanchaje = 0;
        // Lógica para calcular el costo de pilotaje para bandera Venezolana
