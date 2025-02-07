@@ -27,22 +27,7 @@
         <label class="block text-gray-800 text-sm font-bold mb-2" for="puerto">Capitanía</label>
         <select v-model="puerto" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300" id="puerto" name="puerto" required>
           <option value="">Seleccione puerto</option>
-          <option value="apure">Apure</option>
-          <option value="guiria">Guiria</option>
-          <option value="la_ceiba">La Ceiba</option>
-          <option value="la_guaira">La Guaira</option>
-          <option value="ciudad_guayana">Ciudad Guayana</option>
-          <option value="puerto_cabello">Puerto Cabello</option>
-          <option value="las_piedras">Las Piedras</option>
-          <option value="pampatar">Pampatar</option>
-          <option value="puerto_la_cruz">Puerto la Cruz</option>
-          <option value="ciudad_bolivar">Ciudad Bolívar</option>
-          <option value="amazonas">Amazonas</option>
-          <option value="carupano">Carúpano</option>
-          <option value="maracaibo">Maracaibo</option>
-          <option value="miranda">Miranda</option>
-          <option value="puerto_sucre">Puerto Sucre</option>
-          <option value="la_vela_de_coro">La Vela de Coro</option>
+          <option value="2">La Guaira</option>
         </select>
       </div>
 
@@ -50,6 +35,16 @@
         <label class="block text-gray-800 text-sm font-bold mb-2" for="maniobras">Cantidad de Maniobras</label>
         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
                v-model="maniobras" type="text"  @input="validarDecimales('maniobras')" required  placeholder="Ej:1">
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-gray-800 text-sm font-bold mb-2">¿Es turístico de Pasajero?</label>
+        <div class="flex items-center">
+          <input type="radio" id="turisticoSi" value="true" v-model="esTuristico" class="mr-2">
+          <label for="turisticoSi" class="mr-4">Sí</label>
+          <input type="radio" id="turisticoNo" value="false" v-model="esTuristico" class="mr-2">
+          <label for="turisticoNo">No</label>
+        </div>
       </div>
 
       <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
@@ -68,6 +63,9 @@
         <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
         <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
         <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
+        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Remolcador</h2>
+        <p class="text-gray-700">total Remolcador (Euros): {{ resultado.totalremolcador }}</p>
+        <p class="text-gray-700">total Remolcador (Bolivares): {{ resultado.totalremolcadorVES }}</p>
       </div>
       <div v-else>
         <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
@@ -78,22 +76,27 @@
         <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
         <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
         <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
+        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Remolcador</h2>
+        <p class="text-gray-700">total Remolcador (Euros): {{ resultado.totalremolcador }}</p>
+        <p class="text-gray-700">total Remolcador (Bolivares): {{ resultado.totalremolcadorVES }}</p>
       </div>
     </div>
   </div>
-
-  
 </template>
 
 <script>
 export default {
   data() {
     return {
+      esTuristico:'',
       uab: null,
       bandera: '',
       puerto: '',
       resultado: null,
       BCV: '',
+      tc: 4.60,
+      ut: 242.02,
+      maniobras: '',
       alicuotas: {
         a: 1,
         b: 0.0045,
@@ -177,11 +180,48 @@ export default {
         o:	511.00,
         p:	535.00,
 
-      },
+      },  
 
-      tc: 4.60,
-      ut: 242.02,
-      maniobras: "",
+      remolcadorE:{
+        a:	2364.00,
+        b:	2722.00,
+        c:	3114.00,
+        d:	3478.00,
+        e:	4233.00,
+        f:	4536.00,
+        g:	4838.00,
+        h:	5141.00,
+        i:	5443.00,
+        j:	5745.00,
+        k:	6048.00,
+        l:	6350.00,
+        m:	6653.00,
+        n:	7010.00,
+        o:	7368.00,
+        p:	7724.00,
+
+      },
+      remolcadorv:{
+      a:	591.00,
+      b:	680.00,
+      c:	779.00,
+      d:	869.00,
+      e:	1058.00,
+      f:  1134.00,
+      g:	1210.00,
+      h:	1285.00,
+      i:  1361.00,
+      j:	1436.00,
+      k:	1512.00,
+      l:	1588.00,
+      m:	1663.00,
+      n:	1753.00,
+      o:	1842.00,
+      p:	1931.00,
+
+      },
+	
+      
     };
   },
   methods: {
@@ -216,8 +256,10 @@ export default {
     const lanchajeResult = this.CalculaLanchaje();
     this.resultado.totallanchaje = lanchajeResult.totallanchaje;
     this.resultado.totallanchajeVES = lanchajeResult.totallanchajeVES;
-
-
+    
+    const remolcadorResult = this.CalculaRemolcador();
+    this.resultado.totalremolcador = remolcadorResult.totalremolcador;
+    this.resultado.totalremolcadorVES = remolcadorResult.totalremolcadorVES;
 
 },
 
@@ -381,11 +423,8 @@ export default {
     /* ******************************************* */
 
 
-
-
-
   
-    CalculaLanchaje() {
+    CalculaLanchaje(){
     let costolanchaje = 0;
 
     if (this.bandera === "extranjera") {
@@ -486,11 +525,125 @@ export default {
       return {
         totallanchaje: totallanchaje.toFixed(2),
       };
+    },
+
+
+
+
+      /*aquí se encuentra el calculador de Remolcadores*/ 
+    /* ******************************************* */
+    
+
+
+
+    CalculaRemolcador() {
+    let costoremolcador = 0;
+
+    if (this.bandera === "extranjera") {
+      costoremolcador = this.CalculaRemolcadorE(this.uab, this.puerto);
+    } else if (this.bandera === "venezolana") {
+      costoremolcador = this.CalculaRemolcadorV(this.uab, this.puerto);
+    }
+    //console.log('Costo Remolcador:', costoremolcador);
+
+    const totalremolcador = this.puerto * costoremolcador.totalremolcador;
+    const totalremolcadorVES = this.BCV * totalremolcador; // Si esta línea no se usa, considera eliminarla
+    return {
+        totalremolcador: totalremolcador.toFixed(2),
+        totalremolcadorVES: totalremolcadorVES.toFixed(2), // Descomentar si es necesario
+    };
+},
+CalculaRemolcadorE(uab){
+    let costoremolcador = 0;
+       // Lógica para calcular el costo de pilotaje para bandera Venezolana
+    if (uab >= 0 && uab <= 2000) {
+      costoremolcador = this.remolcadorE.a;
+    } else if (uab >= 2001 && uab <= 5000) {
+      costoremolcador = this.remolcadorE.b;
+    } else if (uab >= 5001 && uab <= 10000) {
+      costoremolcador = this.remolcadorE.c;
+    } else if (uab >= 10001 && uab <= 15000) {
+      costoremolcador = this.remolcadorE.d;
+    } else if (uab >= 15001 && uab <= 20000) {
+      costoremolcador = this.remolcadorE.e;
+    } else if (uab >= 20001 && uab <= 25000) {
+      costoremolcador = this.remolcadorE.f;
+    } else if (uab >= 25001 && uab <= 30000) {
+      costoremolcador = this.remolcadorE.g;
+    } else if (uab >= 30001 && uab <= 35000) {
+      costoremolcador = this.remolcadorE.h;
+    } else if (uab >= 35001 && uab <= 40000) {
+      costoremolcador = this.remolcadorE.i;
+    } else if (uab >= 40001 && uab <= 45000) {
+      costoremolcador = this.remolcadorE.j;
+    } else if (uab >= 45001 && uab <= 50000) {
+      costoremolcador = this.remolcadorE.k;
+    } else if (uab >= 50001 && uab <= 70000) {
+      costoremolcador = this.remolcadorE.l;
+    }else if (uab >= 70001  && uab <= 100000) {
+      costoremolcador = this.remolcadorE.m;
+    }else if (uab >= 100001  && uab <= 125000) {
+      costoremolcador = this.remolcadorE.n;
+    }else if (uab >= 125001  && uab <= 150000) {
+      costoremolcador = this.remolcadorE.o;
+    }else if (uab >= 150001) {
+      costoremolcador = this.remolcadorE.p;
+    }
+      const totalremolcador =  costoremolcador ; // Ajusta esto
+      //console.log(totalremolcador)
+      return {
+        totalremolcador: totalremolcador.toFixed(2),
+      };
+
+  },
+  CalculaRemolcadorV(uab){
+    let costoremolcador = 0;
+       // Lógica para calcular el costo de pilotaje para bandera Venezolana
+    if (uab >= 0 && uab <= 2000) {
+      costoremolcador = this.remolcadorv.a;
+    } else if (uab >= 2001 && uab <= 5000) {
+      costoremolcador = this.remolcadorv.b;
+    } else if (uab >= 5001 && uab <= 10000) {
+      costoremolcador = this.remolcadorv.c;
+    } else if (uab >= 10001 && uab <= 15000) {
+      costoremolcador = this.remolcadorv.d;
+    } else if (uab >= 15001 && uab <= 20000) {
+      costoremolcador = this.remolcadorv.e;
+    } else if (uab >= 20001 && uab <= 25000) {
+      costoremolcador = this.remolcadorv.f;
+    } else if (uab >= 25001 && uab <= 30000) {
+      costoremolcador = this.remolcadorv.g;
+    } else if (uab >= 30001 && uab <= 35000) {
+      costoremolcador = this.remolcadorv.h;
+    } else if (uab >= 35001 && uab <= 40000) {
+      costoremolcador = this.remolcadorv.i;
+    } else if (uab >= 40001 && uab <= 45000) {
+      costoremolcador = this.remolcadorv.j;
+    } else if (uab >= 45001 && uab <= 50000) {
+      costoremolcador = this.remolcadorv.k;
+    } else if (uab >= 50001 && uab <= 70000) {
+      costoremolcador = this.remolcadorv.l;
+    }else if (uab >= 70001  && uab <= 100000) {
+      costoremolcador = this.remolcadorv.m;
+    }else if (uab >= 100001  && uab <= 125000) {
+      costoremolcador = this.remolcadorv.n;
+    }else if (uab >= 125001  && uab <= 150000) {
+      costoremolcador = this.remolcadorv.o;
+    }else if (uab >= 150001) {
+      costoremolcador = this.remolcadorv.p;
+    }
+      const totalremolcador =  costoremolcador ; // Ajusta esto
+      
+      return {
+        totalremolcador: totalremolcador.toFixed(2),
+      };
+
+
 
   },
   },
   mounted() {
-    this.obtenerBCV(); // Llamar al método para obtener la tasa al montar el componente
+   // this.obtenerBCV(); // Llamar al método para obtener la tasa al montar el componente
   }
 };
 </script>
