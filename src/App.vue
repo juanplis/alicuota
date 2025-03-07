@@ -1,7 +1,7 @@
 <template>
-  <div id="app" class="max-w-md mx-auto p-6 bg-gradient-to-r from-blue-500 to-green-500 rounded-lg shadow-lg mt-10">
+  <div id="app" class="min-h-screen bg-gradient-to-r from-blue-500 to-green-500 flex flex-col items-center justify-center p-6">
     <h2 class="text-2xl font-bold text-white mb-4 text-center">Calculadora Alícuota INEA</h2>
-    <form @submit.prevent="calcularYMostrarResultado" class="bg-white p-4 rounded-lg shadow-md">
+    <form @submit.prevent="calcularYMostrarResultado" class="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
       <div class="mb-4">
         <label class="block text-gray-800 text-sm font-bold mb-2" for="uab">Tasa del día (BCV)</label>
         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
@@ -34,17 +34,21 @@
       <div class="mb-4">
         <label class="block text-gray-800 text-sm font-bold mb-2" for="maniobras">Cantidad de Maniobras</label>
         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
-               v-model="maniobras" type="text"  @input="validarDecimales('maniobras')" required  placeholder="Ej:1">
+               v-model="maniobras" type="text" @input="validarDecimales('maniobras')" required placeholder="Ej:1">
       </div>
 
       <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2">¿Es turístico de Pasajero?</label>
-        <div class="flex items-center">
-          <input type="radio" id="turisticoSi" value="true" v-model="esTuristico" class="mr-2">
-          <label for="turisticoSi" class="mr-4">Sí</label>
-          <input type="radio" id="turisticoNo" value="false" v-model="esTuristico" class="mr-2">
-          <label for="turisticoNo">No</label>
-        </div>
+        <label class="block text-gray-800 text-sm font-bold mb-2" for="bandera">Tipo de buque</label>
+        <select v-model="tipo_buque" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300" required>
+          <option value="">Seleccione tipo de buque</option>
+          <option value="pesca">Pesquero</option>
+          <option value="carga">Carga</option>
+          <option value="pasajeros">Pasajeros</option>
+          <option value="recreo">Recreativo</option>
+          <option value="deportivos">Deportivo</option>
+
+
+        </select>
       </div>
 
       <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
@@ -52,33 +56,39 @@
       </button>
     </form>
     
-    <div v-if="resultado" class="mt-6 bg-white p-4 rounded-lg shadow-md">
-      <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Alícuota</h2>
-      <div v-if="uab <= 500">
-        <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
-        <p class="text-gray-700">Total (Bolivares): {{ resultado.bs }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Pilotaje</h2>
-        <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
-        <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
-        <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
-        <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Remolcador</h2>
-        <p class="text-gray-700">total Remolcador (Euros): {{ resultado.totalremolcador }}</p>
-        <p class="text-gray-700">total Remolcador (Bolivares): {{ resultado.totalremolcadorVES }}</p>
-      </div>
-      <div v-else>
-        <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
-        <p class="text-gray-700">Total (Bolivares): {{ resultado.totalFinal }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Monto a cancelar Pilotaje</h2>
-        <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
-        <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Lanchaje</h2>
-        <p class="text-gray-700">total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
-        <p class="text-gray-700">total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
-        <h2 class="text-lg font-bold mb-4 text-gray-800">Costo Remolcador</h2>
-        <p class="text-gray-700">total Remolcador (Euros): {{ resultado.totalremolcador }}</p>
-        <p class="text-gray-700">total Remolcador (Bolivares): {{ resultado.totalremolcadorVES }}</p>
+    <div v-if="resultado" class="mt-6 bg-white p-4 rounded-lg shadow-md w-full max-w-3xl">
+      <h2 class="text-lg font-bold mb-4 text-gray-800">Resultados</h2>
+      <div class="flex flex-wrap justify-between">
+        <div class="w-1/2 p-2">
+          <h3 class="text-lg font-bold mb-2">Monto a cancelar Alícuota</h3>
+          <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
+          <p class="text-gray-700">Total (Bolivares): {{ resultado.bs }}</p>
+        </div>
+        <div class="w-1/2 p-2">
+          <h3 class="text-lg font-bold mb-2">Monto a cancelar Pilotaje</h3>
+          <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
+          <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
+        </div>
+        <div class="w-1/2 p-2">
+          <h3 class="text-lg font-bold mb-2">Costo Lanchaje</h3>
+          <p class="text-gray-700">Total Lanchaje (Euros): {{ resultado.totallanchaje }}</p>
+          <p class="text-gray-700">Total Lanchaje (Bolivares): {{ resultado.totallanchajeVES }}</p>
+        </div>
+        <div class="w-1/2 p-2">
+          <h3 class="text-lg font-bold mb-2">Costo Remolcador</h3>
+          <p class="text-gray-700">Total Remolcador (Euros): {{ resultado.totalremolcador }}</p>
+          <p class="text-gray-700">Total Remolcador (Bolivares): {{ resultado.totalremolcadorVES }}</p>
+        </div>
+        <div class="w-1/2 p-2">
+          <h3 class="text-lg font-bold mb-2">Costo Zarpes</h3>
+          <p class="text-gray-700">Total Zarpes (Euros): {{ resultado.totalzarpes }}</p>
+          <p class="text-gray-700">Total Zarpes (Bolivares): {{ resultado.totalzarpesVES }}</p>
+        </div>
+            <div class="w-1/2 p-2">
+        <h3 class="text-lg font-bold mb-2">Costo Inspección</h3>
+        <p class="text-gray-700">Total Inspecciones (Euros): {{ resultado.totalinspecciones }}</p>
+        <p class="text-gray-700">Total Inspecciones (Bolivares): {{ resultado.totalinspeccionesVES }}</p>
+    </div>
       </div>
     </div>
   </div>
@@ -88,7 +98,7 @@
 export default {
   data() {
     return {
-      esTuristico:'',
+      tipo_buque:'',
       uab: null,
       bandera: '',
       puerto: '',
@@ -107,18 +117,18 @@ export default {
       },
       
       pilotajeE:{
-      a: 	817.00,
-      b:	1058.00,
-      c:	1543.00,
-      d:	3145.00,
-      e:	3266.00,
-      f:	3448.00,
-      g:	3719.00,
-      h:	3810.00,
-      i:	4052.00,
-      j:	4263.00,
-      k:	4506.00,
-      l:	5080.00,
+      a: 	571.90,
+      b:	740.60,
+      c:	1080.10,
+      d:	2201.50,
+      e:	2000.00,
+      f:	2800.00,
+      g:	3000.00,
+      h:	3429.00,
+      i:	3645.80,
+      j:	3836.70,
+      k:	4055.40,
+      l:	4572.00,
       m:	5353.00,
       n:	5533.00,
       o:	5776,
@@ -126,75 +136,75 @@ export default {
       },
 
       pilotajeV:{
-      a: 	204.00,
-      b:	265.00,
-      c:	383.00,
-      d:	786.00,
-      e:	816.00,
-      f:	862.00,
-      g:	930.00,
-      h:	953.00,
-      i:	1013.00,
-      j:	1066.00,
-      k:	1126.00,
-      l:	1270.00,
+      a: 	142.80,
+      b:	185.50,
+      c:	270.20,
+      d:	471.20,
+      e:	550.20,
+      f:	675.80,
+      g:	737.00,
+      h:	857.70,
+      i:	911.70,
+      j:	959.40,
+      k:	1013.40,
+      l:	1143.00,
       m:	1338.00,
       n:	1383.00,
       o:	1444.00,  
       p:  1466.00,
       },
       lanchajeE:{
-        a:	574.00,
-        b:	696.00,
-        c:	756.00,
-        d:	817.00,
-        e:	897.00,
-        f:	978.00,
-        g:	1058.00,
-        h:	1139.00,
-        i:	1220.00,
-        j:	1300.00,
-        k:	1381.00,
-        l:	1462.00,
+        a:	401.80,
+        b:	487.20,
+        c:	529.20,
+        d:	578.90,
+        e:	627.90,
+        f:	880.20,
+        g:	952.20,
+        h:	1025.10,
+        i:	1098.00,
+        j:	1170.00,
+        k:	1242.90,
+        l:	1315.80,
         m:	1543.00,
         n:	1623.00,
         o:	1703.00,
-        p:	1784.00,
+        p:	1740.00,
 
       },
       lanchajeV:{
-        a:	172.00,
-        b:	209.00,
-        c:	227.00,
-        d:	245.00,
-        e:	269.00,
-        f:	293.00,
-        g:	318.00,
-        h:	342.00,
-        i:	366.00,
-        j:	390.00,
-        k:	414.00,
-        l:	439.00,
+        a:	120.40,
+        b:	146.30,
+        c:	158.90,
+        d:	171.50,
+        e:	188.30,
+        f:	263.70,
+        g:	286.20,
+        h:	307.80,
+        i:	329.40,
+        j:	351.00,
+        k:	372.60,
+        l:	395.10,
         m:	463.00,
-        n:	487.00,
+        n:	587.00,
         o:	511.00,
         p:	535.00,
 
       },  
 
       remolcadorE:{
-        a:	2364.00,
-        b:	2722.00,
-        c:	3114.00,
-        d:	3478.00,
-        e:	4233.00,
-        f:	4536.00,
-        g:	4838.00,
-        h:	5141.00,
-        i:	5443.00,
-        j:	5745.00,
-        k:	6048.00,
-        l:	6350.00,
+        a:	1654.80,
+        b:	1905.40,
+        c:	2179.80,
+        d:	2434.60,
+        e:	2500.00,
+        f:	3600.00,
+        g:	3900.00,
+        h:	4626.90,
+        i:	4898.70,
+        j:	5170.50,
+        k:	5443.20,
+        l:	5715.00,
         m:	6653.00,
         n:	7010.00,
         o:	7368.00,
@@ -202,26 +212,74 @@ export default {
 
       },
       remolcadorv:{
-      a:	591.00,
-      b:	680.00,
-      c:	779.00,
-      d:	869.00,
-      e:	1058.00,
-      f:  1134.00,
-      g:	1210.00,
-      h:	1285.00,
-      i:  1361.00,
-      j:	1436.00,
-      k:	1512.00,
-      l:	1588.00,
+      a:	413.70,
+      b:	476.00,
+      c:	545.30,
+      d:	608.30,
+      e:	740.60,
+      f:  1020.60,
+      g:	1089.00,
+      h:	1156.50,
+      i:  1224.90,
+      j:	1292.40,
+      k:	1360.80,
+      l:	1429.20,
       m:	1663.00,
       n:	1753.00,
       o:	1842.00,
       p:	1931.00,
 
       },
-	
-      
+
+      zarpesVPCP:{
+      a:	2.50,
+      b:	5.00,
+      c:	10.00,
+      d:	20.00,
+      e:	30.00,
+      f:  40.00,
+      g:  50.00,
+      h:  60.00,
+      },
+
+      zarpesVRD:{
+      a:	10.00,
+      b:	20.00,
+      c:	25.00,
+      d:	35.00,
+      e:	45.00,
+      f:  55.00,
+      g:  65.00,
+      h:  75.00,
+      },
+
+
+      zarpesEPCP:{
+      a:	30.00,
+      b:	50.00,
+      c:	60.00,
+      d:	70.00,
+      e:	80.00,
+      f:  90.00,
+      g:  100.00,
+      h:  120.00,
+      },
+      zarpesERD:{
+      a:	20.00,
+      b:	40.00,
+      c:	50.00,
+      d:	70.00,
+      e:	90.00,
+      f:  120.00,
+      g:  150.00,
+      h:  200.00,
+      },  
+      inspecciones:{
+      a:	10.00,
+      b:	25.00,
+      c:	50.00,
+      d:	100.00,
+      },
     };
   },
   methods: {
@@ -246,11 +304,10 @@ export default {
     this.resultado = this.manejarMayor501(this.uab, this.bandera);
   }
 
-  // Llama a CalculaPilotaje y añade el resultado
+  
   const pilotajeResult = this.CalculaPilotaje();
-  this.resultado.totalppilotaje = pilotajeResult.totalppilotaje; // Agregar el total de pilotaje
-  //this.totalppilotajeVES = pilotajeResult.totalppilotajeVES;
-  this.resultado.totalppilotajeVES = pilotajeResult.totalppilotajeVES; // Asegúrate de que estás asignando correctamente
+  this.resultado.totalppilotaje = pilotajeResult.totalppilotaje; 
+  this.resultado.totalppilotajeVES = pilotajeResult.totalppilotajeVES; 
 
   
     const lanchajeResult = this.CalculaLanchaje();
@@ -261,6 +318,15 @@ export default {
     this.resultado.totalremolcador = remolcadorResult.totalremolcador;
     this.resultado.totalremolcadorVES = remolcadorResult.totalremolcadorVES;
 
+
+    const zarpesResult =this.CalculaZarpes();
+    this.resultado.totalzarpes = zarpesResult.totalzarpes;
+    this.resultado.totalzarpesVES = zarpesResult.totalzarpesVES;
+    
+
+    const inspecionesResult =this.CalculaInsp();
+    this.resultado.totalinspecciones = inspecionesResult.totalinspecciones;
+    this.resultado.totalinspeccionesVES = inspecionesResult.totalinspeccionesVES;
 },
 
 
@@ -417,12 +483,9 @@ export default {
 
   },
 
-
-
     /*aquí se encuentra el calculador de Lanchaje*/ 
     /* ******************************************* */
-
-
+    
   
     CalculaLanchaje(){
     let costolanchaje = 0;
@@ -638,13 +701,237 @@ CalculaRemolcadorE(uab){
         totalremolcador: totalremolcador.toFixed(2),
       };
 
+  },
 
 
+
+            /*************************aqui se calcula el zarpes **************************/
+       /*****---------------------------------------------------------------------------******/
+             /***************************************************************************/
+
+
+
+
+            CalculaZarpes() {
+    let costozarpes = 0;
+
+
+/*******************CALCÚLO DE ZARPES VENEZOLANO**************************/ 
+      switch (true) {
+      case (this.bandera === "venezolana" && 
+            this.tipo_buque === "pesca" ):
+          costozarpes = this.CalculaZarpesVPCP(this.uab);
+          break;
+
+      case (this.bandera === "venezolana" && this.tipo_buque === "carga"):
+          costozarpes = this.CalculaZarpesVPCP(this.uab);
+          break;
+
+      case (this.bandera === "venezolana" && this.tipo_buque === "pasajeros"):
+          costozarpes = this.CalculaZarpesVPCP(this.uab);
+          break;
+          
+      case (this.bandera === "venezolana" && this.tipo_buque === "recreo"):
+          costozarpes = this.CalculaZarpesVRD(this.uab);
+          break;
+
+      case (this.bandera === "venezolana" && this.tipo_buque === "deportivos"):
+          costozarpes = this.CalculaZarpesVRD(this.uab);
+          break;
+
+  /*******************CALCÚLO DE ZARPES EXTRANJERO**************************/ 
+
+      case (this.bandera === "extranjera" && this.tipo_buque === "pesca"):
+          costozarpes = this.CalculaZarpesEPCP(this.uab);
+          break;
+
+
+      case (this.bandera === "extranjera" && this.tipo_buque === "carga"):
+          costozarpes = this.CalculaZarpesEPCP(this.uab);
+          break;
+
+      case (this.bandera === "extranjera" && this.tipo_buque === "pasajeros"):
+          costozarpes = this.CalculaZarpesEPCP(this.uab);
+          break;
+
+      case (this.bandera === "extranjera" && this.tipo_buque === "recreo"):
+          costozarpes = this.CalculaZarpesERD(this.uab);
+          break;
+      case (this.bandera === "extranjera" && this.tipo_buque === "deportivos"):
+          costozarpes = this.CalculaZarpesERD(this.uab);
+          break;
+  
+      default:
+
+      
+          // Puedes manejar otros casos aquí si es necesario
+          break;
+          
+         }
+
+      const totalzarpes = costozarpes.totalzarpes;
+      const totalzarpesVES = this.BCV * totalzarpes; // Si esta línea no se usa, considera eliminarla
+      return {
+          totalzarpes: totalzarpes,
+          totalzarpesVES: totalzarpesVES, // Descomentar si es necesario
+      };
   },
+
+
+CalculaZarpesVPCP(uab){
+
+    let costozarpes = 0;
+       // Lógica para calcular el costo de pilotaje para bandera Venezolana
+    if (uab >= 0 && uab <= 5) {
+      costozarpes = this.zarpesVPCP.a;
+    } else if (uab >= 5 && uab <= 25) {
+      costozarpes = this.zarpesVPCP.b;
+    } else if (uab >= 25 && uab <= 50) {
+      costozarpes = this.zarpesVPCP.c;
+    } else if (uab >= 50 && uab <= 150) {
+      costozarpes = this.zarpesVPCP.d;
+    } else if (uab >= 150 && uab <= 500) {
+      costozarpes = this.zarpesVPCP.e;
+    } else if (uab >= 500 && uab <= 1500) {
+      costozarpes = this.zarpesVPCP.f;
+    } else if (uab >= 1500 && uab <= 5000) {
+      costozarpes = this.zarpesVPCP.g;
+    } else if (uab >= 5000 ) {
+      costozarpes = this.zarpesVPCP.h;
+    } 
+    const totalzarpes =  costozarpes ; // Ajusta esto
+      
+      return {
+        totalzarpes: totalzarpes,
+      };
+
   },
-  mounted() {
-   // this.obtenerBCV(); // Llamar al método para obtener la tasa al montar el componente
-  }
+
+  CalculaZarpesVRD(uab) {
+    let costozarpes = 0;
+    if (uab >= 0 && uab <= 5) {
+        costozarpes = this.zarpesVRD.a;
+    } else if (uab >= 5 && uab <= 25) {
+        costozarpes = this.zarpesVRD.b;
+    } else if (uab >= 25 && uab <= 50) {
+        costozarpes = this.zarpesVRD.c;
+    } else if (uab >= 50 && uab <= 150) {
+        costozarpes = this.zarpesVRD.d;
+    } else if (uab >= 150 && uab <= 500) {
+        costozarpes = this.zarpesVRD.e;
+    } else if (uab >= 500 && uab <= 1500) {
+        costozarpes = this.zarpesVRD.f;
+    } else if (uab >= 1500 && uab <= 5000) {
+        costozarpes = this.zarpesVRD.g;
+    } else if (uab >= 5000) {
+        costozarpes = this.zarpesVRD.h;
+    }
+    const totalzarpes = costozarpes; // Ajusta esto
+    return {
+        totalzarpes: totalzarpes,
+    };
+
+},
+
+CalculaZarpesEPCP(uab) {
+    let costozarpes = 0;
+    if (uab >= 0 && uab <= 5) {
+        costozarpes = this.zarpesEPCP.a;
+    } else if (uab >= 5 && uab <= 25) {
+        costozarpes = this.zarpesEPCP.b;
+    } else if (uab >= 25 && uab <= 50) {
+        costozarpes = this.zarpesEPCP.c;
+    } else if (uab >= 50 && uab <= 150) {
+        costozarpes = this.zarpesEPCP.d;
+    } else if (uab >= 150 && uab <= 500) {
+        costozarpes = this.zarpesEPCP.e;
+    } else if (uab >= 500 && uab <= 1500) {
+        costozarpes = this.zarpesEPCP.f;
+    } else if (uab >= 1500 && uab <= 5000) {
+        costozarpes = this.zarpesEPCP.g;
+    } else if (uab >= 5000) {
+        costozarpes = this.zarpesEPCP.h;
+    }
+    const totalzarpes = costozarpes; // Ajusta esto
+    return {
+        totalzarpes: totalzarpes,
+    };
+
+},
+
+CalculaZarpesERD(uab) {
+    let costozarpes = 0;
+    if (uab >= 0 && uab <= 5) {
+        costozarpes = this.zarpesERD.a;
+    } else if (uab >= 5 && uab <= 25) {
+        costozarpes = this.zarpesERD.b;
+    } else if (uab >= 25 && uab <= 50) {
+        costozarpes = this.zarpesERD.c;
+    } else if (uab >= 50 && uab <= 150) {
+        costozarpes = this.zarpesERD.d;
+    } else if (uab >= 150 && uab <= 500) {
+        costozarpes = this.zarpesERD.e;
+    } else if (uab >= 500 && uab <= 1500) {
+        costozarpes = this.zarpesERD.f;
+    } else if (uab >= 1500 && uab <= 5000) {
+        costozarpes = this.zarpesERD.g;
+    } else if (uab >= 5000) {
+        costozarpes = this.zarpesERD.h;
+    }
+    const totalzarpes = costozarpes; // Ajusta esto
+    return {
+        totalzarpes: totalzarpes,
+    };
+
+},
+
+            /************************************************************************************/
+            /*************************aqui se calcula las Inspecciones **************************/
+       /*****---------------------------------------------------------------------------******/
+
+       CalculaInsp() {
+
+      let inspecciones = 0;
+
+
+      if (this.bandera === "extranjera") {
+        inspecciones = this.CalculaInspE(this.uab);
+        
+      }
+      
+      const totalinspecciones = inspecciones.totalinspecciones;
+      const totalinspeccionesVES = this.BCV * totalinspecciones; // Descomentar si es necesario
+
+      return {
+        totalinspecciones: totalinspecciones,
+        totalinspeccionesVES: totalinspeccionesVES, // Descomentar si es necesario
+      };
+    },
+
+    CalculaInspE(uab) {
+
+      let inspecciones = 0;
+
+      if (uab >= 5 && uab <= 50) {
+        inspecciones = this.inspecciones.a;
+      } else if (uab >= 51 && uab <= 100) {
+        inspecciones = this.inspecciones.b;
+      } else if (uab >= 101 && uab <= 500) {
+        inspecciones = this.inspecciones.c;
+      } else if (uab > 500) {
+        inspecciones = this.inspecciones.d;
+      }
+
+      const totalinspecciones = inspecciones; // Ajusta esto
+      return {
+        totalinspecciones: totalinspecciones,
+      };
+    },
+
+    mounted() {
+      // this.obtenerBCV(); // Llamar al método para obtener la tasa al montar el componente
+    },
+  },
 };
 </script>
 
