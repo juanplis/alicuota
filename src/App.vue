@@ -1,18 +1,18 @@
 <template>
   <div id="app" class="min-h-screen bg-gradient-to-r from-blue-500 to-green-500 flex flex-col items-center justify-center p-6">
-    <h2 class="text-2xl font-bold text-white mb-4 text-center">Calculadora Alícuota INEA</h2>
+    <h1 class="text-2xl font-bold text-white mb-4 text-center">Portal Calculador de Servicios de INEA (Ventana Virtual)</h1>
     <form @submit.prevent="calcularYMostrarResultado" class="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
       <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2" for="uab">Tasa del día (BCV)</label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
-               v-model="BCV" type="text" required @input="validarDecimales('BCV')" placeholder="Ej: 1234.56">
-      </div>
+  <label class="block text-gray-800 text-sm font-bold mb-2" for="uab">Tasa del día (BCV)</label>
+  <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
+         v-model="BCV" type="text" required @input="validarDecimales('BCV')" @paste.prevent="validarDecimales('BCV')" @copy.prevent="validarDecimales('BCV')" placeholder="Ej: 1234.56">
+</div>
 
-      <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2" for="uab">Unidad de Arqueo Bruto (UAB)</label>
-        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
-               v-model="uab" type="text" required @input="validarDecimales('uab')" placeholder="Ej: 1234.56">
-      </div>
+<div class="mb-4">
+  <label class="block text-gray-800 text-sm font-bold mb-2" for="uab">Unidad de Arqueo Bruto (UAB)</label>
+  <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
+         v-model="uab" type="text" required @input="validarDecimales('uab')" @paste.prevent="validarDecimales('uab')" placeholder="Ej: 1234.56">
+</div>
 
       <div class="mb-4">
         <label class="block text-gray-800 text-sm font-bold mb-2" for="bandera">Bandera</label>
@@ -27,12 +27,12 @@
         <label class="block text-gray-800 text-sm font-bold mb-2" for="puerto">Capitanía</label>
         <select v-model="puerto" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300" id="puerto" name="puerto" required>
           <option value="">Seleccione puerto</option>
-          <option value="2">La Guaira</option>
+          <option value="1">La Guaira</option>
         </select>
       </div>
 
       <div class="mb-4">
-        <label class="block text-gray-800 text-sm font-bold mb-2" for="maniobras">Cantidad de Maniobras</label>
+        <label class="block text-gray-800 text-sm font-bold mb-2" for="maniobras">Cantidad de Maniobras  <br> (Lanchaje y Pilotaje)</label>
         <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:ring focus:ring-blue-300"
                v-model="maniobras" type="text" @input="validarDecimales('maniobras')" required placeholder="Ej:1">
       </div>
@@ -60,12 +60,12 @@
       <h2 class="text-lg font-bold mb-4 text-gray-800">Resultados</h2>
       <div class="flex flex-wrap justify-between">
         <div class="w-1/2 p-2">
-          <h3 class="text-lg font-bold mb-2">Monto a cancelar Alícuota</h3>
+          <h3 class="text-lg font-bold mb-2">Costo Alícuota</h3>
           <p class="text-gray-700">Total (Euros): {{ resultado.totalEuros }}</p>
           <p class="text-gray-700">Total (Bolivares): {{ resultado.bs }}</p>
         </div>
         <div class="w-1/2 p-2">
-          <h3 class="text-lg font-bold mb-2">Monto a cancelar Pilotaje</h3>
+          <h3 class="text-lg font-bold mb-2">Costo Pilotaje</h3>
           <p class="text-gray-700">Total Pilotaje (Euros): {{ resultado.totalppilotaje }}</p>
           <p class="text-gray-700">Total Pilotaje (Bolivares): {{ resultado.totalppilotajeVES }}</p>
         </div>
@@ -125,7 +125,7 @@ export default {
       f:	2800.00,
       g:	3000.00,
       h:	3429.00,
-      i:	3645.80,
+      i:	3646.80,
       j:	3836.70,
       k:	4055.40,
       l:	4572.00,
@@ -285,10 +285,17 @@ export default {
   methods: {
   validarDecimales(campo) {
     const valor = this[campo];
-    const regex = /^\d+(\.\d{0,2})?$/; // Permite hasta dos decimales
+    if (valor !== null && typeof valor !== 'undefined') {
+      const regex = /^\d+(\.\d{0,2})?$/; // Permite hasta dos decimales
 
-    if (!regex.test(valor)) {
-      this[campo] = valor.slice(0, -1); // Elimina el último carácter no válido
+      if (!regex.test(valor)) {
+        this[campo] = valor.slice(0, -1); // Elimina el último carácter no válido
+      }
+    }
+
+    // Evitar copiar y pegar
+    if (event.type === 'paste' || event.type === 'copy') {
+      event.preventDefault();
     }
   },
 
@@ -802,7 +809,7 @@ CalculaZarpesVPCP(uab){
     const totalzarpes =  costozarpes ; // Ajusta esto
       
       return {
-        totalzarpes: totalzarpes,
+        totalzarpes: totalzarpes.toFixed(2),
       };
 
   },
@@ -828,7 +835,7 @@ CalculaZarpesVPCP(uab){
     }
     const totalzarpes = costozarpes; // Ajusta esto
     return {
-        totalzarpes: totalzarpes,
+        totalzarpes: totalzarpes.toFixed(2),
     };
 
 },
@@ -854,7 +861,7 @@ CalculaZarpesEPCP(uab) {
     }
     const totalzarpes = costozarpes; // Ajusta esto
     return {
-        totalzarpes: totalzarpes,
+        totalzarpes: totalzarpes.toFixed(2),
     };
 
 },
@@ -880,7 +887,7 @@ CalculaZarpesERD(uab) {
     }
     const totalzarpes = costozarpes; // Ajusta esto
     return {
-        totalzarpes: totalzarpes,
+        totalzarpes: totalzarpes.toFixed(2),
     };
 
 },
@@ -890,44 +897,45 @@ CalculaZarpesERD(uab) {
        /*****---------------------------------------------------------------------------******/
 
        CalculaInsp() {
+  let inspecciones = 0;
 
-      let inspecciones = 0;
+  if (this.bandera === "extranjera") {
+    inspecciones = this.CalculaInspE(this.uab);
+  }
 
+  const totalinspecciones = inspecciones.totalinspecciones;
+  let totalinspeccionesVES = "";
 
-      if (this.bandera === "extranjera") {
-        inspecciones = this.CalculaInspE(this.uab);
-        
-      }
-      
-      const totalinspecciones = inspecciones.totalinspecciones;
-      const totalinspeccionesVES = this.BCV * totalinspecciones; // Descomentar si es necesario
+  if (totalinspecciones === 0) {
+    totalinspeccionesVES = "N/A";
+  } else {
+    totalinspeccionesVES = this.BCV * totalinspecciones;
+  }
 
-      return {
-        totalinspecciones: totalinspecciones,
-        totalinspeccionesVES: totalinspeccionesVES, // Descomentar si es necesario
-      };
-    },
+  return {
+    totalinspecciones: totalinspecciones || "N/A",
+    totalinspeccionesVES: totalinspeccionesVES || "N/A",
+  };
+},
 
-    CalculaInspE(uab) {
+CalculaInspE(uab) {
+  let inspecciones = 0;
 
-      let inspecciones = 0;
+  if (uab >= 5 && uab <= 50) {
+    inspecciones = this.inspecciones.a;
+  } else if (uab >= 51 && uab <= 100) {
+    inspecciones = this.inspecciones.b;
+  } else if (uab >= 101 && uab <= 500) {
+    inspecciones = this.inspecciones.c;
+  } else if (uab > 500) {
+    inspecciones = this.inspecciones.d;
+  }
 
-      if (uab >= 5 && uab <= 50) {
-        inspecciones = this.inspecciones.a;
-      } else if (uab >= 51 && uab <= 100) {
-        inspecciones = this.inspecciones.b;
-      } else if (uab >= 101 && uab <= 500) {
-        inspecciones = this.inspecciones.c;
-      } else if (uab > 500) {
-        inspecciones = this.inspecciones.d;
-      }
-
-      const totalinspecciones = inspecciones; // Ajusta esto
-      return {
-        totalinspecciones: totalinspecciones,
-      };
-    },
-
+  const totalinspecciones = inspecciones;
+  return {
+    totalinspecciones: totalinspecciones,
+  };
+},
     mounted() {
       // this.obtenerBCV(); // Llamar al método para obtener la tasa al montar el componente
     },
